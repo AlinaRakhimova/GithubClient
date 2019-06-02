@@ -20,15 +20,13 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     UserList userList;
     @Inject
     GithubApi githubApi;
-    private String login;
 
     public void onStart(String login) {
-        this.login = login;
-        getUserObservable();
+        getGithubUser(login);
     }
 
     @SuppressLint("CheckResult")
-    private void getUserObservable() {
+    void getGithubUser(String login) {
         getViewState().showProgressBar();
         githubApi.requestUser(login)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -41,7 +39,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                 });
     }
 
-    private void getDetailUser(User user) {
+    void getDetailUser(User user) {
         String avatarUrl = user.getAvatarUrl();
         String userName = user.getName();
         String userLogin = user.getLogin();
