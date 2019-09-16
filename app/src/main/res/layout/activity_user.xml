@@ -4,17 +4,14 @@
     android:id="@+id/cardViewUser"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginBottom="8dp"
+    android:layout_margin="@dimen/margin_standard"
     android:clickable="true"
     android:focusable="true"
     card_view:cardBackgroundColor="@color/colorPrimary"
-    card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="8dp"
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation_standard"
     card_view:strokeColor="@color/colorPrimaryDark"
-    card_view:strokeWidth="1dp">
+    card_view:strokeWidth="@dimen/stroke_width_standard">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -25,7 +22,7 @@
             android:layout_width="@dimen/width_avatar"
             android:layout_height="@dimen/height_avatar"
             android:contentDescription="@string/user"
-            android:padding="8dp"
+            android:padding="@dimen/padding_standard"
             android:src="@drawable/user_placeholder"
             android:textAppearance="?attr/textAppearanceListItem"
             card_view:layout_constraintStart_toStartOf="parent"
@@ -34,11 +31,12 @@
         <TextView
             android:id="@+id/login"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:paddingStart="8dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="8dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/padding_standard"
+            android:paddingTop="@dimen/padding_min"
+            android:paddingEnd="@dimen/padding_standard"
             android:text="@string/app_name"
+            android:textSize="@dimen/text_size_header"
             card_view:layout_constraintStart_toEndOf="@+id/avatar"
             card_view:layout_constraintTop_toTopOf="parent" />
 
