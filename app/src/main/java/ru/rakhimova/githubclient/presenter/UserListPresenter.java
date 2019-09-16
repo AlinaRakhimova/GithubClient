@@ -1,30 +1,39 @@
 package ru.rakhimova.githubclient.presenter;
 
-import android.annotation.SuppressLint;
-
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import ru.rakhimova.githubclient.model.entity.User;
 import ru.rakhimova.githubclient.model.entity.UserList;
 import ru.rakhimova.githubclient.model.network.GithubApi;
 import ru.rakhimova.githubclient.view.userlist.IViewHolder;
 import ru.rakhimova.githubclient.view.userlist.UserListView;
 
+import static ru.rakhimova.githubclient.model.Constants.ERROR_RETRIEVING_DATA_FROM_SERVER;
+
 @InjectViewState
 public class UserListPresenter extends MvpPresenter<UserListView> {
 
     @Inject
     GithubApi githubApi;
+
     @Inject
     UserList userList;
+
     private RecyclerUserListPresenter recyclerGalleryPresenter;
+
+    private Disposable disposable;
 
     public UserListPresenter() {
         recyclerGalleryPresenter = new RecyclerUserListPresenter();
+    }
+
+    public RecyclerUserListPresenter getRecyclerGalleryPresenter() {
+        return recyclerGalleryPresenter;
     }
 
     @Override
@@ -34,7 +43,6 @@ public class UserListPresenter extends MvpPresenter<UserListView> {
         getGithubUsers(startPage, startPosition);
     }
 
-    @SuppressLint("CheckResult")
     public void getGithubUsers(int page, int position) {
         getViewState().showProgressBar();
         String pageString = String.valueOf(page);
@@ -43,13 +51,13 @@ public class UserListPresenter extends MvpPresenter<UserListView> {
             since = (int) userList.getUsers().get(position).getId();
         } else since = 0;
         String sinceString = String.valueOf(since);
-        githubApi.requestAllUsers(pageString, sinceString)
+        disposable = githubApi.requestAllUsers(pageString, sinceString)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(newUsers -> {
-                    userList.getUsers().addAll(newUsers);
+                .subscribe(users -> {
+                    userList.getUsers().addAll(users);
                     ifRequestSuccess();
                 }, throwable -> {
-                    getViewState().showToast("Error retrieving data from server");
+                    getViewState().showToast(ERROR_RETRIEVING_DATA_FROM_SERVER);
                     getViewState().hideProgressBar();
                 });
     }
@@ -60,16 +68,27 @@ public class UserListPresenter extends MvpPresenter<UserListView> {
         getViewState().setLoading(false);
     }
 
-    public RecyclerUserListPresenter getRecyclerGalleryPresenter() {
-        return recyclerGalleryPresenter;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) disposable.dispose();
     }
 
     public class RecyclerUserListPresenter implements IRecyclerUserListPresenter {
 
         @Override
         public void bindView(IViewHolder holder) {
-            User user = getUser(holder);
+            User user = getUser(holder.getPos());
             holder.setUser(user.getLogin(), user.getAvatarUrl());
+        }
+
+        @Override
+        public void onClickDetail(int position) {
+            getViewState().showDetailActivity(getUser(position).getLogin());
+        }
+
+        private User getUser(int position) {
+            return userList.getUsers().get(position);
         }
 
         @Override
@@ -78,15 +97,6 @@ public class UserListPresenter extends MvpPresenter<UserListView> {
                 return userList.getUsers().size();
             }
             return 0;
-        }
-
-        @Override
-        public void onClickDetail(IViewHolder holder) {
-            getViewState().showDetailActivity(getUser(holder).getLogin());
-        }
-
-        private User getUser(IViewHolder holder) {
-            return userList.getUsers().get(holder.getPos());
         }
     }
 }

@@ -8,5 +8,5 @@ public interface IRecyclerUserListPresenter {
 
     int getItemCount();
 
-    void onClickDetail(IViewHolder iViewHolder);
+    void onClickDetail(int position);
 }

@@ -26,10 +26,13 @@ public class UserListActivity extends MvpAppCompatActivity implements UserListVi
 
     @BindView(R.id.listUsers)
     RecyclerView userRecycler;
+
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
+
     @InjectPresenter
     UserListPresenter presenter;
+
     private UserListAdapter userListAdapter;
     private LinearLayoutManager mLayoutManager;
     private boolean loading;

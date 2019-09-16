@@ -1,40 +1,39 @@
 package ru.rakhimova.githubclient.presenter;
 
-import android.annotation.SuppressLint;
-
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import ru.rakhimova.githubclient.model.entity.User;
-import ru.rakhimova.githubclient.model.entity.UserList;
 import ru.rakhimova.githubclient.model.network.GithubApi;
 import ru.rakhimova.githubclient.view.detail.DetailView;
+
+import static ru.rakhimova.githubclient.model.Constants.ERROR_RETRIEVING_DATA_FROM_SERVER;
 
 @InjectViewState
 public class DetailPresenter extends MvpPresenter<DetailView> {
 
     @Inject
-    UserList userList;
-    @Inject
     GithubApi githubApi;
+
+    private Disposable disposable;
 
     public void onStart(String login) {
         getGithubUser(login);
     }
 
-    @SuppressLint("CheckResult")
     void getGithubUser(String login) {
         getViewState().showProgressBar();
-        githubApi.requestUser(login)
+        disposable = githubApi.requestUser(login)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(user -> {
                     getDetailUser(user);
                     getViewState().hideProgressBar();
                 }, throwable -> {
-                    getViewState().showToast("Error retrieving data from server ");
+                    getViewState().showToast(ERROR_RETRIEVING_DATA_FROM_SERVER);
                     getViewState().hideProgressBar();
                 });
     }
@@ -48,5 +47,11 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
         String userFollowers = String.valueOf((int) user.getFollowers());
         String profileCreatedAt = user.getCreatedAt().substring(0, 10);
         getViewState().showUser(avatarUrl, userName, userLogin, userUrl, userBio, userFollowers, profileCreatedAt);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) disposable.dispose();
     }
 }

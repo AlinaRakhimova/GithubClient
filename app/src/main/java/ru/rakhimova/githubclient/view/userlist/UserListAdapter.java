@@ -34,9 +34,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.activity_user, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        holder.avatar.setOnClickListener(v -> presenter.onClickDetail(holder));
-        return holder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         return presenter.getItemCount();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements IViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements IViewHolder, View.OnClickListener {
 
         @BindView(R.id.avatar)
         ImageView avatar;
@@ -63,6 +61,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         private ViewHolder(final View view) {
             super(view);
             ButterKnife.bind(this, view);
+            view.setOnClickListener(this);
         }
 
         @Override
@@ -74,6 +73,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         @Override
         public int getPos() {
             return position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            presenter.onClickDetail(getAdapterPosition());
         }
     }
 }

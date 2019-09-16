@@ -8,9 +8,6 @@ import ru.rakhimova.githubclient.R;
 
 public class PicassoLoader {
 
-    public PicassoLoader() {
-    }
-
     public void loadImage(String url, ImageView imageView) {
         Picasso
                 .get()
